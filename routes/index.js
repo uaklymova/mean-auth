@@ -7,6 +7,11 @@ var Comment = require('../models/Comment');
 // var Post = mongoose.model('Post');
 // var Comment = mongoose.model('Comment');
 
+/* GET home page. */
+router.get('/', function(req, res) {
+  res.render('index');
+});
+
 router.param('post', function(req, res, next, id) {
   var query = Post.findById(id);
 
@@ -30,11 +35,7 @@ router.param('comment', function(req, res, next, id) {
   });
 });
 
-/*
-router.get('/posts/:post', function(req, res) {
-   res.json(req.post);
- });
- */
+
 router.get('/posts', function(req, res, next) {
   Post.find(function (err, posts) {
     if(err){return next(err);}
