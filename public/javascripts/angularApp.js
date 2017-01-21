@@ -5,8 +5,6 @@ app.config([
     '$urlRouterProvider',
     function($stateProvider, $urlRouterProvider) {
 
-        console.log('here1');
-
         $stateProvider
             .state('home', {
                 url: '/home',
@@ -18,11 +16,17 @@ app.config([
                     }]
                 }
             })
-            
             .state('posts', {
                 url: '/posts/{id}',
                 templateUrl: '/posts.html',
-                controller: 'PostsCtrl'
+                controller: 'PostsCtrl',
+                resolve : {
+                    post : ['$stateParams', 'posts',
+                        function($stateParams, posts) {
+                            return posts.get($stateParams.id);
+                        }]
+
+                }
             });
 
         $urlRouterProvider.otherwise('home');
@@ -33,15 +37,15 @@ app.factory('posts', ['$http',function($http){
         posts:[]
     };
     o.getAll = function (/*$http, posts*/) {
-        // return $http.get('/posts').success(function (data) {     // success() allows to bind function that will be executed when the request returns.
-        //     console.log("success");
-        //     angular.copy(data, o.posts);                        //$scope.posts variable in MainCtrl will also be updated, ensuring new values are reflect in view
-        // $http.get('/someUrl', config).then(successCallback, errorCallback);
-        $http.get('/posts').then(function (data) {     // success() allows to bind function that will be executed when the request returns.
+        return $http.get('/posts').success(function (data) {     // success() allows to bind function that will be executed when the request returns.
             console.log("success");
-            angular.copy(data, o.posts);
-        }, function (err) {
-            console.log("error");
+            angular.copy(data, o.posts);                        //$scope.posts variable in MainCtrl will also be updated, ensuring new values are reflect in view
+        /* $http.get('/someUrl', config).then(successCallback, errorCallback);
+         $http.get('/posts').then(function (data) {     // success() allows to bind function that will be executed when the request returns.
+             console.log("success");
+             angular.copy(data, o.posts);
+         }, function (err) {
+        */
 
         })
     };
@@ -54,6 +58,20 @@ app.factory('posts', ['$http',function($http){
         return $http.put('/posts/' + post._id + '/upvote')
             .success(function(data){
                 post.upvotes += 1;
+            });
+    };
+    o.addComment = function(id, comment) {
+        return $http.post('/posts/' + id + '/comments', comment);
+    };
+    o.get = function(id) {
+        return $http.get('/posts/' + id).then(function(res){
+            return res.data;
+        });
+    };
+    o.upvoteComment = function(post, comment) {
+        return $http.put('/posts/' + post._id + '/comments/'+ comment._id + '/upvote')
+            .success(function(data){
+                comment.upvotes += 1;
             });
     };
     return o;
@@ -92,20 +110,30 @@ app.controller('MainCtrl', [
     }]);
 app.controller('PostsCtrl', [
     '$scope',
-    '$stateParams',
+    // '$stateParams',
     'posts',
-    function ($scope, $stateParams, posts) {
+    'post',
+    function ($scope, posts, post ) {
         //id
-        $scope.post = posts.posts[$stateParams.id];
-        console.log('here5');
+        // $scope.post = posts.posts[$stateParams.id];
+        $scope.post = post;
         $scope.addComment = function () {
             if ($scope.body === '') {return;}
 
-            $scope.post.comments.push({
+            posts.addComment(post._id, {
                 body:   $scope.body,
-                author: 'user',
-                upvotes: 0
+                author: 'user'
+            }).success(function (comment) {
+                $scope.post.comments.push(comment);
             });
+            /* $scope.post.comments.push({
+                 body:   $scope.body,
+                 author: 'user',
+                 upvotes: 0
+             });*/
+            $scope.incrementUpvotes = function(comment){
+                posts.upvoteComment(post, comment);
+            };
             $scope.body = '';
         }
     }
