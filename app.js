@@ -5,6 +5,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
+var passport = require('passport');
 
 var index = require('./routes/index');
 var users = require('./routes/users');
@@ -12,6 +13,8 @@ var users = require('./routes/users');
 var app = express();
 require('./models/Post');
 require('./models/Comment');
+require('./models/User');
+
 // mongoose.connect('mongodb://localhost/news');
 mongoose.connect('mongodb://127.0.0.1/news');
 
@@ -26,6 +29,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+//init passport
+app.use(passport.initialize());
 
 app.use('/', index);
 app.use('/users', users);
