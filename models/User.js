@@ -36,4 +36,4 @@ UserSchema.methods.generateJWT = function() {
     }, 'SECRET');  //in real- use environment variable for referencing the secret and keep it out of codebase
 };
 
-mongoose.model('User', UserSchema);
+module.exports = mongoose.model('User', UserSchema);
