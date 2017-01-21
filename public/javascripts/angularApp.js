@@ -76,6 +76,52 @@ app.factory('posts', ['$http',function($http){
     };
     return o;
 }]);
+app.factory('auth', ['$http', '$window', function($http, $window){
+    var auth = {};
+    auth.saveToken = function (token){
+        $window.localStorage['flapper-news-token'] = token;
+    };
+
+    auth.getToken = function (){
+        return $window.localStorage['flapper-news-token'];
+    };
+    auth.isLoggedIn = function(){
+        var token = auth.getToken();
+
+        if(token){
+            var payload = JSON.parse($window.atob(token.split('.')[1]));
+
+            return payload.exp > Date.now() / 1000;
+        } else {
+            return false;
+        }
+    };
+
+    auth.currentUser = function(){
+        if(auth.isLoggedIn()){
+            var token = auth.getToken();
+            var payload = JSON.parse($window.atob(token.split('.')[1]));
+
+            return payload.username;
+        }
+    };
+    auth.register = function(user){
+        return $http.post('/register', user).success(function(data){
+            auth.saveToken(data.token);
+        });
+    };
+    auth.logIn = function(user){
+        return $http.post('/login', user).success(function(data){
+            auth.saveToken(data.token);
+        });
+    };
+    auth.logOut = function(){
+        $window.localStorage.removeItem('flapper-news-token');
+    };
+
+
+    return auth;
+}]);
 
 app.controller('MainCtrl', [
     '$scope',
@@ -85,7 +131,9 @@ app.controller('MainCtrl', [
         console.log('here4');
         $scope.addPost = function () {
             if (!$scope.title || $scope.title === ''){return;}
-            /*$scope.posts.push({
+            /*
+             it was first step - BEFORE creating func
+            $scope.posts.push({
                 title:   $scope.title,
                 link:    $scope.link,
                 upvotes: 0,
@@ -126,7 +174,8 @@ app.controller('PostsCtrl', [
             }).success(function (comment) {
                 $scope.post.comments.push(comment);
             });
-            /* $scope.post.comments.push({
+            /*it was first step - BEFORE creating func
+             $scope.post.comments.push({
                  body:   $scope.body,
                  author: 'user',
                  upvotes: 0
