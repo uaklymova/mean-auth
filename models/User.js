@@ -1,4 +1,3 @@
-require('../config/passport');
 var crypto = require('crypto');
 var jwt = require('jsonwebtoken');
 var mongoose = require('mongoose');
@@ -12,10 +11,10 @@ var UserSchema = new mongoose.Schema({
 UserSchema.methods.setPassword = function(password){
     this.salt = crypto.randomBytes(16).toString('hex');
 
-    this.hash = crypto.pbkdf2Sync(password, this.salt, 1000, 64).toString('hex');
+    this.hash = crypto.pbkdf2Sync(password, this.salt, 1000, 64, 'sha1').toString('hex');
 };
 UserSchema.methods.validPassword = function(password) {
-    var hash = crypto.pbkdf2Sync(password, this.salt, 1000, 64).toString('hex');
+    var hash = crypto.pbkdf2Sync(password, this.salt, 1000, 64, 'sha1').toString('hex');
 
     return this.hash === hash;
 };
@@ -36,4 +35,9 @@ UserSchema.methods.generateJWT = function() {
     }, 'SECRET');  //in real- use environment variable for referencing the secret and keep it out of codebase
 };
 
-module.exports = mongoose.model('User', UserSchema);
+ module.exports = mongoose.model('User', UserSchema);
+
+//  var User = mongoose.model('User', UserSchema);
+//
+// User.findOne({username: "test2"}, function(err, user) {console.log(user);});
+// module.exports = User;

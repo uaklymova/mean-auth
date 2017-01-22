@@ -3,6 +3,8 @@ var passport = require('passport');
 var express = require('express');
 var router = express.Router();
 
+require('../config/passport');
+
 var mongoose = require('mongoose');
 var User = require('../models/User');
 var Post = require('../models/Post');
@@ -117,17 +119,8 @@ router.post('/login', function(req, res, next){
   if(!req.body.username || !req.body.password){
     return res.status(400).json({message: 'Please fill out all fields'});
   }
-
-  var user = new User();
-  user.username = req.body.username;
-  user.
-  
-  console.log(req.body.username + " " + req.body.password);
   passport.authenticate('local', function(err, user, info){
     if(err){
-
-      console.log(user);
-      console.log('log in err');
       return next(err); }
 
     if(user){
@@ -137,4 +130,5 @@ router.post('/login', function(req, res, next){
     }
   })(req, res, next);
 });
+
 module.exports = router;

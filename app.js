@@ -1,19 +1,20 @@
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
+var express      = require('express');
+var path         = require('path');
+var favicon      = require('serve-favicon');
+var logger       = require('morgan');
 var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-var mongoose = require('mongoose');
-var passport = require('passport');
+var bodyParser   = require('body-parser');
+var mongoose     = require('mongoose');
+var passport     = require('passport');
 
 var index = require('./routes/index');
 var users = require('./routes/users');
 
 var app = express();
-require('./models/Post');
-require('./models/Comment');
-require('./models/User');
+
+// require('./models/Post');
+// require('./models/Comment');
+// require('./models/User');
 
 // mongoose.connect('mongodb://localhost/news');
 mongoose.connect('mongodb://127.0.0.1/news');
