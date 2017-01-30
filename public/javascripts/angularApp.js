@@ -14,7 +14,8 @@ app.config(['$stateProvider', '$urlRouterProvider',
                     }]
 
             }
-        }).state('posts', {
+        }).
+        state('posts', {
             url : '/posts/:id',
             templateUrl : '/posts.html',
             controller : 'PostsCtrl',
@@ -25,7 +26,8 @@ app.config(['$stateProvider', '$urlRouterProvider',
                     }]
 
             }
-        }).state('login', {
+        })
+            .state('login', {
             url : '/login',
             templateUrl : '/login.html',
             controller : 'AuthCtrl',
@@ -113,10 +115,6 @@ app.factory('posts', ['$http', 'auth',
                 angular.copy(data, o.posts);
             });
         };
-        //now we'll need to create new posts
-        //uses the router.post in index.js to post a new Post mongoose model to mongodb
-        //when $http gets a success back, it adds this post to the posts object in
-        //this local factory, so the mongodb and angular data is the same
         o.create = function(post) {
             return $http.post('/posts', post, {
                 headers: {Authorization: 'Bearer '+auth.getToken()}
@@ -140,9 +138,6 @@ app.factory('posts', ['$http', 'auth',
             });
         };
         o.get = function(id) {
-            //use the express route to grab this post and return the response
-            //from that route, which is a json of the post data
-            //.then is a promise, a kind of newly native thing in JS that upon cursory research
             return $http.get('/posts/' + id).then(function(res) {
                 return res.data;
             });
@@ -192,8 +187,6 @@ app.controller('MainCtrl', ['$scope', 'posts', 'auth',
         };
 
         $scope.upvote = function(post) {
-            //post factory has an upvote() function in it
-            console.log('Upvoting:' + post.title + "votes before:" + post.upvotes);
             posts.upvote(post);
         };
         $scope.downvote = function(post) {
